@@ -41,13 +41,16 @@ public class FileClient {
 			// read file size from server
 			serverData = new DataInputStream(in);
 			long size = serverData.readLong();     
-
+			long temp=size;
+			System.out.println("File size: "+size);
 			// write to file in 1kb chunk
 			int bytesRead=0;
 			byte[] buffer = new byte[1024];     
 			output = new FileOutputStream("downloaded.mp3");
 			while (size > 0 && (bytesRead = serverData.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1)     
 			{   
+				System.out.println((temp-size)+" bytes read");
+				Thread.sleep(1000);
 				output.write(buffer, 0, bytesRead);     
 				size -= bytesRead;     
 			}  

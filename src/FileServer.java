@@ -31,7 +31,7 @@ class FileTransfer extends Thread{
 		try{
 			InputStream in = clientSocket.getInputStream();  
 			DataInputStream clientData = new DataInputStream(in);
-
+			
 			// read filename
 			String filename = clientData.readUTF();
 			File myFile = new File(filename); // open file named filename
@@ -47,13 +47,13 @@ class FileTransfer extends Thread{
 
 			OutputStream os = clientSocket.getOutputStream();  
 
-
 			//Sending file size to the client  
 			DataOutputStream dos = new DataOutputStream(os);          
 			dos.writeLong(mybytearray.length);
 
 			//Sending file data to the server  
 			os.write(mybytearray, 0, mybytearray.length);  
+			
 			os.flush();  
 
 			os.close();
@@ -62,6 +62,7 @@ class FileTransfer extends Thread{
 			clientData.close();
 			dis.close();
 			clientSocket.close();
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();
