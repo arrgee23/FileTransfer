@@ -13,6 +13,7 @@ public class FileClient {
 	DataOutputStream dos=null;
 	DataInputStream serverData = null;
 	OutputStream output = null;
+	static final int CHUNK_SIZE = 1024;
 	
 	public FileClient() {
 		try {
@@ -43,17 +44,20 @@ public class FileClient {
 			long size = serverData.readLong();     
 			long temp=size;
 			System.out.println("File size: "+size);
+			
 			// write to file in 1kb chunk
 			int bytesRead=0;
-			byte[] buffer = new byte[1024];     
-			output = new FileOutputStream("downloaded.mp3");
+			byte[] buffer = new byte[CHUNK_SIZE];     
+			output = new FileOutputStream("downloaded_"+filename);
 			while (size > 0 && (bytesRead = serverData.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1)     
 			{   
 				System.out.println((temp-size)+" bytes read");
-				Thread.sleep(1000);
+				
 				output.write(buffer, 0, bytesRead);     
 				size -= bytesRead;     
 			}  
+			System.out.println("Done...");
+			
 			//Closing socket
 			in.close();
 			os.close();

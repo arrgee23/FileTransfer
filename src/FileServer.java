@@ -1,5 +1,24 @@
-import java.net.*;     
-import java.io.*;     
+/*
+ * Open two terminals
+ * javac *.java
+ * execute "java FileServer" in one terminal/console window
+ * execute "java FileClient" in another
+ * write the filename with full path in client side console (the file must exist on server side)
+ * specify the speed in server side console 
+ * the file is saved in client side as "download_(filename)"
+ */
+
+
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
 public class FileServer{
 
 	public static void main(String args[]) throws Exception
@@ -17,7 +36,8 @@ public class FileServer{
 class FileTransfer extends Thread{  
 
 	Socket clientSocket = null;
-
+	static final int CHUNK_SIZE = 1024;
+	
 	public FileTransfer(Socket soc) {
 		try{
 			clientSocket = soc;
@@ -32,37 +52,52 @@ class FileTransfer extends Thread{
 			InputStream in = clientSocket.getInputStream();  
 			DataInputStream clientData = new DataInputStream(in);
 			
+			// read speed from for this connection
+			System.out.println("Enter speed in KBps for "+clientSocket.getInetAddress());
+			Scanner s = new Scanner(System.in);
+			int speed = s.nextInt();
+			s.close();
+			
 			// read filename
 			String filename = clientData.readUTF();
 			File myFile = new File(filename); // open file named filename
 
 			////////////////// file exists assumed /////////////////
 
-			// read from file into buffer
-			byte[] mybytearray = new byte[(int) myFile.length()];  
-			FileInputStream fis = new FileInputStream(myFile);  
-			BufferedInputStream bis = new BufferedInputStream(fis);  
-			DataInputStream dis = new DataInputStream(bis);     
-			dis.readFully(mybytearray, 0, mybytearray.length);  
 
 			OutputStream os = clientSocket.getOutputStream();  
 
 			//Sending file size to the client  
 			DataOutputStream dos = new DataOutputStream(os);          
-			dos.writeLong(mybytearray.length);
-
-			//Sending file data to the server  
-			os.write(mybytearray, 0, mybytearray.length);  
+			dos.writeLong(myFile.length());
 			
-			os.flush();  
-
+			// write to file in 1kb*speed chunk per second
+			int bytesRead=0;
+			byte[] buffer = new byte[CHUNK_SIZE*speed];
+			long size = myFile.length();
+			long temp=size;
+			FileInputStream fis = new FileInputStream(myFile);  
+			BufferedInputStream bis = new BufferedInputStream(fis);
+			DataInputStream dis = new DataInputStream(bis);
+			
+			while (size > 0 && (bytesRead = dis.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1)     
+			{   
+				System.out.println((temp-size)+" bytes written");
+				Thread.sleep(1000);
+				os.write(buffer, 0, bytesRead);     
+				size -= bytesRead;     
+			}  
+			// done
+			System.out.println("Done...");
+			System.out.println("Waiting for new connections");
+			// close streams
 			os.close();
 			dos.close();
 			in.close();
 			clientData.close();
 			dis.close();
 			clientSocket.close();
-			
+
 		}
 		catch(Exception e){
 			e.printStackTrace();
