@@ -6,6 +6,8 @@
  * write the filename with full path in client side console (the file must exist on server side)
  * specify the speed in server side console 
  * the file is saved in client side as "download_(filename)"
+ * 
+ * https://github.com/arrgee23/FileTransfer.git
  */
 
 
