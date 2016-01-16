@@ -10,22 +10,23 @@
 
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 public class FileServer{
 
 	public static void main(String args[]) throws Exception
 	{
 		@SuppressWarnings("resource")
 		ServerSocket soc=new ServerSocket(13267);
-		System.out.println("FTP Server Started on Port Number 5217");
+		System.out.println("FTP Server Started on Port Number 13267");
 		while(true)
 		{
 			System.out.println("Waiting for Connection ...");
@@ -54,9 +55,8 @@ class FileTransfer extends Thread{
 			
 			// read speed from for this connection
 			System.out.println("Enter speed in KBps for "+clientSocket.getInetAddress());
-			Scanner s = new Scanner(System.in);
-			int speed = s.nextInt();
-			s.close();
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			int speed = Integer.parseInt(br.readLine());
 			
 			// read filename
 			String filename = clientData.readUTF();
@@ -96,7 +96,7 @@ class FileTransfer extends Thread{
 			in.close();
 			clientData.close();
 			dis.close();
-			clientSocket.close();
+			//clientSocket.close();
 
 		}
 		catch(Exception e){

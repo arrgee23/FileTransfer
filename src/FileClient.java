@@ -1,10 +1,11 @@
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class FileClient {  
 	Socket sock=null;
@@ -31,9 +32,8 @@ public class FileClient {
 		try{
 			// scan filename
 			System.out.print("Enter the name of the file: ");
-			Scanner s = new Scanner(System.in);
-			String filename = s.next();
-			s.close();
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			String filename = br.readLine();
 			
 			// send filename to the server
 			dos = new DataOutputStream(os);     
